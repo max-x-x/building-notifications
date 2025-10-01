@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: building_notification_postgres_db
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    expose:
+      - "5432"
+    volumes:
+      - building_notification_postgres_data:/var/lib/postgresql/data
+    command: >
+      postgres 
+      -c listen_addresses=*
+      -c password_encryption=scram-sha-256
+
+  app:
+    build: .
+    container_name: notification_app
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=myapp
+      - login=servic3serv@yandex.ru
+      - password=rvhmhusbebcwrabs
+      - PUBLIC_BASE_URL=https://building-notifications.itc-hub.ru
+      - ACCESS_TOKEN=your_access_token_here
+    depends_on:
+      - postgres
+    ports:
+      - "8021:8001"
+    restart: unless-stopped
+
+volumes:
+  building_notification_postgres_data:
